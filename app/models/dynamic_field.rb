@@ -1,0 +1,98 @@
+class DynamicField < ActiveRecord::Base
+  COLUMN_TYPES = ['Binary','Boolean','Date','Datetime','Decimal','Float','Integer','String','Text','Time','Timestamp']
+
+  belongs_to :dynamic_form
+  belongs_to :fieldable, :polymorphic => true, :dependent => :destroy
+  has_many :dynamic_field_checks, :dependent => :destroy
+  has_many :dynamic_field_formats, :dependent => :destroy
+
+  has_many :dynamic_field_dependency_parents, :class_name => 'DynamicFieldDependency', :foreign_key => 'child_id', :dependent => :delete_all
+  has_many :dynamic_field_dependency_children, :class_name => 'DynamicFieldDependency', :foreign_key => 'parent_id', :dependent => :delete_all
+  has_and_belongs_to_many :parents, :class_name => 'DynamicField', :join_table => 'dynamic_field_dependencies', :association_foreign_key => 'parent_id', :foreign_key => 'child_id', :before_add => :adding_parent
+  has_and_belongs_to_many :children, :class_name => 'DynamicField', :join_table => 'dynamic_field_dependencies', :association_foreign_key => 'child_id', :foreign_key => 'parent_id', :before_add => :adding_child
+
+  named_scope :active, :conditions => ["active = ?", true]
+  named_scope :duplicate_checking, :conditions => ["check_duplication = ?", true]
+  named_scope :default_order, :order => 'sort ASC'
+  named_scope :with_parents, :include => :parents # To help reduce database queries.
+  named_scope :with_formats, :include => :dynamic_field_formats # To help reduce database queries.
+
+  validates_presence_of :dynamic_form_id, :fieldable, :column_name
+  validates_uniqueness_of :column_name, :scope => :dynamic_form_id
+  validates_inclusion_of :active, :required, :check_duplication, :in => [true, false]
+  validates_inclusion_of :column_type, :in => COLUMN_TYPES
+
+
+  def fieldable_type=(sType)
+    super(sType.to_s.classify.constantize.base_class.to_s) unless sType.blank?
+  end
+
+  def field_type
+    fieldable_type.sub('Dynamic','').underscore
+  end
+
+  def dynamic_attributes(params={})
+    {self.column_name.to_sym => params[self.column_name]}
+  end
+
+  def field_attributes(params={})
+    {
+      :required => self.required,
+      :column_name => self.column_name,
+      :label => self.label,
+      :display => self.display_field?(params),
+      :field_type => self.fieldable_type.gsub(/^Dynamic/, '').underscore,
+      :value => self.fieldable.field_value(params),#self.format(self.fieldable.field_value(params), 'display'), # I'm not sure now if formatting will be used.
+      :column_type => self.column_type
+    }.merge(self.fieldable.field_attributes(params))
+  end
+
+  def display_field?(params={})
+    if self.parents.empty? # Database queries will be significantly reduced if self.parents are preloaded.
+      return true
+    else
+      fulfilled_parents = true
+      parents.each do |parent|
+        fulfilled_parents = false unless parent.fulfilled?(params)
+      end
+      return fulfilled_parents
+    end
+  end
+
+  def fulfilled?(params={})
+    params[self.column_name.to_sym]
+  end
+
+  def format(value, format_when)
+    self.dynamic_field_formats.default_order.when(format_when).each do |dynamic_field_format|
+      value.gsub!(dynamic_field_format.match, dynamic_field_format.replace)
+    end unless self.dynamic_field_formats.empty? # Database queries will be significantly reduced if self.dynamic_field_formats are preloaded.
+    return value
+  end
+
+  def default_error_name
+    return self.label.empty? ? self.column_name : "\"#{self.label}\"";
+  end
+
+
+private
+
+  def adding_parent(dynamic_field)
+    adding_dependent('parent', dynamic_field)
+  end
+
+  def adding_child(dynamic_field)
+    adding_dependent('child', dynamic_field)
+  end
+
+  def adding_dependent(dependent_type, dynamic_field)
+    if dependent_type == 'parent' && self.parents.include?(dynamic_field)
+      raise Exception.new("#{dynamic_field.column_name} is already a parent field for this.")
+    elsif dependent_type == 'child' && self.children.include?(dynamic_field)
+      raise Exception.new("#{dynamic_field.column_name} is already a child field for this.")
+    elsif dynamic_field.id == self.id
+      raise Exception.new("Field cannot depend on itself.")
+    end
+  end
+
+end
