@@ -4,6 +4,7 @@ class DynamicForm < ActiveRecord::Base
 
   validates_presence_of :name
   validates_uniqueness_of :name
+  validates_numericality_of :duplication_days, :allow_nil => true, :only_integer => true, :greater_than => 0
 
 
   def fields
