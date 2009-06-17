@@ -1,0 +1,14 @@
+<%
+content_for :breadcrumbs, breadcrumbs_builder(
+  [
+    link_to('Sites', admin_sites_path),
+    link_to(@site.name, admin_site_path(@site)),
+    link_to('Forms', admin_site_dynamic_forms_path(@site)),
+    link_to(@dynamic_form.name, admin_site_dynamic_form_path(@site, @dynamic_form)),
+    'Edit'
+  ]
+)
+content_for :heading, 'Edit Form'
+%>
+
+<%= render 'form' %>

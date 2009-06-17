@@ -1,0 +1,28 @@
+<%
+content_for :breadcrumbs, breadcrumbs_builder(
+  [
+    link_to('Sites', admin_sites_path),
+    link_to(@site.name, admin_site_path(@site)),
+    'Forms'
+  ]
+)
+content_for :heading, 'Forms'
+content_for :actions, actions_builder([
+  link_to('Add Form', new_admin_site_dynamic_form_url(@site))
+])
+%>
+
+<table cellpadding="0" cellspacing="0" class="list">
+  <tr>
+    <th>Name</th>
+    <th>Active</th>
+    <th>Select</th>
+  </tr>
+<% @forms.each do |dynamic_form| -%>
+  <tr class="<%= cycle('odd','even') %>">
+    <td><%= dynamic_form.name %></td>
+    <td align="center"><%= dynamic_form.active? ? "Yes" : "No" %></td>
+    <td><%= link_to 'Select', admin_site_dynamic_form_url(@site, dynamic_form) %></td>
+  </tr>
+<% end -%>
+</table>
