@@ -4,7 +4,7 @@ class CreateDynamicFields < ActiveRecord::Migration
       t.timestamps
       t.integer :dynamic_form_id, :null => false
       t.boolean :active, :default => false
-      t.integer :sort, :null => false
+      t.integer :sort, :null => false, :default => 0
       t.string :fieldable_type
       t.integer :fieldable_id
       t.boolean :required, :null => false, :default => true

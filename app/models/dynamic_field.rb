@@ -1,4 +1,5 @@
 class DynamicField < ActiveRecord::Base
+  FIELDABLE_TYPES = ['DynamicCheckBox','DynamicHiddenField','DynamicPhone','DynamicRadioButton','DynamicSelect','DynamicTextArea','DynamicTextField']
   COLUMN_TYPES = ['Binary','Boolean','Date','Datetime','Decimal','Float','Integer','String','Text','Time','Timestamp']
 
   belongs_to :dynamic_form
@@ -20,7 +21,10 @@ class DynamicField < ActiveRecord::Base
   validates_presence_of :dynamic_form_id, :fieldable, :column_name
   validates_uniqueness_of :column_name, :scope => :dynamic_form_id
   validates_inclusion_of :active, :required, :check_duplication, :in => [true, false]
+  validates_inclusion_of :fieldable_type, :in => FIELDABLE_TYPES
   validates_inclusion_of :column_type, :in => COLUMN_TYPES
+
+  before_create :set_sort
 
 
   def fieldable_type=(sType)
@@ -28,7 +32,7 @@ class DynamicField < ActiveRecord::Base
   end
 
   def field_type
-    fieldable_type.sub('Dynamic','').underscore
+    self.fieldable_type.sub('Dynamic','').underscore unless self.fieldable_type.blank?
   end
 
   def dynamic_attributes(params={})
@@ -93,6 +97,10 @@ private
     elsif dynamic_field.id == self.id
       raise Exception.new("Field cannot depend on itself.")
     end
+  end
+
+  def set_sort
+    self.sort = self.dynamic_form.dynamic_fields_solo.count if self.sort.nil? || self.sort == 0
   end
 
 end
