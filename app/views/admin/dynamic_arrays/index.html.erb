@@ -1,0 +1,14 @@
+<%= render_partial_if_exists "index_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="list">
+  <tr>
+    <th>Name</th>
+    <th>Select</th>
+  </tr>
+<% @arrays.each do |array| -%>
+  <tr class="<%= cycle('odd','even') %>">
+    <td><%= array.name %></td>
+    <td><%= link_to 'Select', admin_dynamic_array_path(array) %></td>
+  </tr>
+<% end -%>
+</table>
