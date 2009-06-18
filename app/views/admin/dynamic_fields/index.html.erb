@@ -1,0 +1,22 @@
+<%= render_partial_if_exists "index_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="list">
+  <tr>
+    <th>Name</th>
+    <th>Active</th>
+    <th>Required</th>
+    <th>Dup Check</th>
+    <th>Type</th>
+    <th>Select</th>
+  </tr>
+<% @fields.each do |field| -%>
+  <tr class="<%= cycle('odd','even') %>">
+    <td><%= field.column_name %></td>
+    <td align="center"><%= field.active? ? "Yes" : "No" %></td>
+    <td align="center"><%= field.required? ? "Yes" : "No" %></td>
+    <td align="center"><%= field.check_duplication? ? "Yes" : "No" %></td>
+    <td><%= field.field_type %></td>
+    <td><%= link_to 'Select', admin_site_dynamic_field_url(@site, field) %></td>
+  </tr>
+<% end -%>
+</table>

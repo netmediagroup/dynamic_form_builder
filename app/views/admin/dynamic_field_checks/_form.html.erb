@@ -1,0 +1,26 @@
+<%= error_messages_for :field_check %>
+<% form_for @redirect_to_field_check do |form| %>
+
+<table cellpadding="0" cellspacing="0" class="edit">
+  <tr>
+    <td class="label"><%= form.label :check_for, 'For' %></td>
+    <td class="value"><%= form.select(:check_for, DynamicFieldCheck::CHECK_FORS.map {|t| [t.titleize, t]}, :prompt => true) %></td>
+  </tr>
+  <tr>
+    <td class="label"><%= form.label :check_type, 'Type' %></td>
+    <td class="value"><%= form.select(:check_type, DynamicFieldCheck::CHECK_TYPES.map {|t| [t, t]}, :prompt => true) %></td>
+  </tr>
+  <tr>
+    <td class="label"><%= form.label :check_value, 'Value' %></td>
+    <td class="value"><%= form.text_field :check_value %></td>
+  </tr>
+  <tr>
+    <td class="label"><%= form.label :custom_message %></td>
+    <td class="value"><%= form.text_field :custom_message %></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="submit"><%= submit_tag %></td>
+  </tr>
+</table>
+
+<% end %>

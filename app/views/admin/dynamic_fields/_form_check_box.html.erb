@@ -1,0 +1,8 @@
+<tr>
+  <td class="label"><%= label :fieldable, :combine_option_groups %></td>
+  <td class="value"><%= check_box_tag 'fieldable[combine_option_groups]', '1', @field && @field.fieldable.combine_option_groups? %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :missing_value_error %></td>
+  <td class="value"><%= text_field_tag 'fieldable[missing_value_error]', @field.nil? ? nil : @field.fieldable.missing_value_error %></td>
+</tr>

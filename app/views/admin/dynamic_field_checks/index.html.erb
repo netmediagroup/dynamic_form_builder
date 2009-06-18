@@ -1,0 +1,18 @@
+<%= render_partial_if_exists "index_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="list">
+  <tr>
+    <th>For</th>
+    <th>Type</th>
+    <th>Value</th>
+    <th>Select</th>
+  </tr>
+<% @field_checks.each do |field_check| -%>
+  <tr class="<%= cycle('odd','even') %>">
+    <td><%= field_check.check_for %></td>
+    <td><%= field_check.check_type %></td>
+    <td><%= field_check.check_value %></td>
+    <td><%= link_to 'Select', admin_site_dynamic_field_dynamic_field_check_url(@site, @field, field_check) %></td>
+  </tr>
+<% end -%>
+</table>

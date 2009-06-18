@@ -1,0 +1,49 @@
+<%= render_partial_if_exists "show_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="show">
+  <tr id="detail_created_at" style="display:none;">
+    <td class="label">Created</td>
+    <td class="value"><%= @field.created_at %></td>
+  </tr>
+  <tr id="detail_updated_at" style="display:none;">
+    <td class="label">Last Updated</td>
+    <td class="value"><%= @field.updated_at %></td>
+  </tr>
+  <tr>
+    <td class="label">Active</td>
+    <td class="value"><%= @field.active? ? 'Yes' : 'No' %></td>
+  </tr>
+  <tr>
+    <td class="label">Required</td>
+    <td class="value"><%= @field.required? ? 'Yes' : 'No' %></td>
+  </tr>
+  <tr>
+    <td class="label">Check Duplication</td>
+    <td class="value"><%= @field.check_duplication? ? 'Yes' : 'No' %></td>
+  </tr>
+  <tr>
+    <td class="label">Column Name</td>
+    <td class="value"><%= @field.column_name %></td>
+  </tr>
+  <tr id="detail_column_type" style="display:none;">
+    <td class="label">Column Type</td>
+    <td class="value"><%= @field.column_type %></td>
+  </tr>
+  <tr>
+    <td class="label">Label</td>
+    <td class="value"><%= @field.label %></td>
+  </tr>
+  <tr>
+    <td class="label">Required Error</td>
+    <td class="value"><%= @field.required_error %></td>
+  </tr>
+  <tr>
+    <td class="label">Type</td>
+    <td class="value"><%= @field.field_type %></td>
+  </tr>
+<%= render "show_#{@field.field_type}" unless @field.field_type.blank? %>
+</table>
+<%= link_to_function("more...", nil, :id => "more_link") do |page|
+  page.show('detail_created_at','detail_updated_at','detail_column_type')
+  page['more_link'].hide
+end %>

@@ -1,0 +1,12 @@
+<tr>
+  <td class="label"><%= label :fieldable, :maxlength %></td>
+  <td class="value"><%= text_field_tag 'fieldable[maxlength]', @field.nil? ? nil : @field.fieldable.maxlength %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :size %></td>
+  <td class="value"><%= text_field_tag 'fieldable[size]', @field.nil? ? nil : @field.fieldable.size %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :prompt %></td>
+  <td class="value"><%= text_field_tag 'fieldable[prompt]', @field.nil? ? nil : @field.fieldable.prompt %></td>
+</tr>

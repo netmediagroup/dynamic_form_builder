@@ -1,0 +1,16 @@
+<tr>
+  <td class="label"><%= label :fieldable, :rows %></td>
+  <td class="value"><%= text_field_tag 'fieldable[rows]', @field.nil? ? nil : @field.fieldable.rows %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :columns %></td>
+  <td class="value"><%= text_field_tag 'fieldable[columns]', @field.nil? ? nil : @field.fieldable.columns %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :prompt %></td>
+  <td class="value"><%= text_field_tag 'fieldable[prompt]', @field.nil? ? nil : @field.fieldable.prompt %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :wordwrapping, 'Word Wrapping' %></td>
+  <td class="value"><%= text_field_tag 'fieldable[wordwrapping]', @field.nil? ? nil : @field.fieldable.wordwrapping %></td>
+</tr>

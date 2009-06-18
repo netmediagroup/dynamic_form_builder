@@ -1,0 +1,4 @@
+<tr>
+  <td class="label"><%= label :fieldable, :default_value %></td>
+  <td class="value"><%= text_field_tag 'fieldable[default_value]', @field.nil? ? nil : @field.fieldable.default_value %></td>
+</tr>

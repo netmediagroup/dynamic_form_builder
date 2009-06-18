@@ -1,7 +1,7 @@
 class DynamicFieldCheck < ActiveRecord::Base
   CHECK_FORS = ['qualify','validate']
-  CHECK_TYPES = ['custom_true','custom_false','email','numerical','length','min_length','max_length','split_true','split_false','array_true','array_false']
-  CHECK_TYPES_THAT_REQUIRE_VALUE = ['custom_true','custom_false','length','min_length','max_length','split_true','split_false','array_true','array_false']
+  CHECK_TYPES = ['array_true','array_false','custom_true','custom_false','email','length','min_length','numerical','max_length','split_true','split_false']
+  CHECK_TYPES_THAT_REQUIRE_VALUE = ['array_true','array_false','custom_true','custom_false','length','min_length','max_length','split_true','split_false']
 
   belongs_to :dynamic_field
 
@@ -16,28 +16,28 @@ class DynamicFieldCheck < ActiveRecord::Base
 
   def check_field(field_value)
     case self.check_type
+      when 'array_true'
+        !field_value.nil? && !self.value_array.has_item_value?(field_value).nil?
+      when 'array_false'
+        field_value.nil? || self.value_array.has_item_value?(field_value).nil?
       when 'custom_true'
         !field_value.nil? && !field_value.match(self.check_value).nil?
       when 'custom_false'
         field_value.nil? || field_value.match(self.check_value).nil?
       when 'email'
         !field_value.nil? && !field_value.match(self.check_value || /\A[\w-]+(\.[\w-]+)*@([\w-]+(\.[\w-]+)*?\.[a-zA-Z]{2,6}|(\d{1,3}\.){3}\d{1,3})(:\d{4})?\Z/).nil?
-      when 'numerical'
-        !field_value.nil? && !field_value.match(self.check_value || /\A[+\-]?\d+\Z/).nil?
       when 'length'
         !field_value.nil? && field_value.length == self.check_value.to_i
       when 'min_length'
         !field_value.nil? && field_value.length >= self.check_value.to_i
       when 'max_length'
         !field_value.nil? && field_value.length <= self.check_value.to_i
+      when 'numerical'
+        !field_value.nil? && !field_value.match(self.check_value || /\A[+\-]?\d+\Z/).nil?
       when 'split_true'
         !field_value.nil? && self.value_split.include?(field_value)
       when 'split_false'
         field_value.nil? || !self.value_split.include?(field_value)
-      when 'array_true'
-        !field_value.nil? && !self.value_array.has_item_value?(field_value).nil?
-      when 'array_false'
-        field_value.nil? || self.value_array.has_item_value?(field_value).nil?
     end
   end
 
@@ -54,17 +54,17 @@ class DynamicFieldCheck < ActiveRecord::Base
       return self.custom_message
     else
       msg = case self.check_type
+        when 'array_true'   then self.message(:inclusion)
+        when 'array_false'  then self.message(:exclusion)
         when 'custom_true'  then self.message(:invalid)
         when 'custom_false' then self.message(:invalid)
         when 'email'        then self.message(:invalid)
-        when 'numerical'    then self.message(:not_a_number)
         when 'length'       then self.message(:wrong_length)
         when 'min_length'   then self.message(:too_short)
         when 'max_length'   then self.message(:too_long)
+        when 'numerical'    then self.message(:not_a_number)
         when 'split_true'   then self.message(:inclusion)
         when 'split_false'  then self.message(:exclusion)
-        when 'array_true'   then self.message(:inclusion)
-        when 'array_false'  then self.message(:exclusion)
       end
       return "#{self.dynamic_field.default_error_name} #{msg}"
     end
