@@ -1,12 +1,12 @@
 class Admin::DynamicFieldsController < ApplicationController
   before_filter :load_form, :only => [:index, :new, :create]
+  before_filter :load_fields, :only => [:index, :edit_sort]
   before_filter :load_field, :only => [:show, :edit, :update, :destroy]
   before_filter :load_new_field, :only => [:new, :create]
   before_filter :load_form_action_new, :only => [:new, :create]
   before_filter :load_form_action_edit, :only => [:edit, :update]
 
   def index
-    @fields = @dynamic_form.dynamic_fields.default_order
   end
 
   def new
@@ -55,7 +55,7 @@ class Admin::DynamicFieldsController < ApplicationController
   def destroy
     @field.destroy
     flash[:notice] = 'Field was deleted.'
-    redirect_to admin_dynamic_form_path(@dynamic_form)
+    redirect_to admin_dynamic_form_path(@field.dynamic_form)
   end
 
   def change_type
@@ -66,11 +66,26 @@ class Admin::DynamicFieldsController < ApplicationController
     end
   end
 
+  def edit_sort
+  end
+
+  def update_sort
+    params[:fields_list].each_index do |i|
+      id = params[:fields_list].fetch(i)
+      DynamicField.find(id).update_attribute('sort', i)
+    end
+    render :nothing => true
+  end
+
 
 protected
 
   def load_form
     @dynamic_form = DynamicForm.find(params[:dynamic_form_id])
+  end
+
+  def load_fields
+    @fields = @dynamic_form.dynamic_fields.default_order
   end
 
   def load_field
