@@ -1,0 +1,72 @@
+class Admin::DynamicArrayItemsController < Admin::AdminController
+  before_filter :load_array, :only => [:index, :new, :create]
+  before_filter :load_array_items, :only => [:index]
+  before_filter :load_array_item, :only => [:show, :edit, :update, :destroy]
+  before_filter :load_new_array_item, :only => [:new, :create]
+  before_filter :load_form_action_new, :only => [:new, :create]
+  before_filter :load_form_action_edit, :only => [:edit, :update]
+
+  def index
+  end
+
+  def new
+  end
+
+  def create
+    if @array_item.save
+      flash[:notice] = 'Array was created.'
+      redirect_to [:admin, @array_item]
+    else
+      render :new
+    end
+  end
+
+  def show
+  end
+
+  def edit
+  end
+
+  def update
+    if @array_item.update_attributes(params[:dynamic_array_item])
+      flash[:notice] = 'Array item was updated.'
+      redirect_to [:admin, @array_item]
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @array_item.destroy
+    flash[:notice] = 'Array item was deleted.'
+    redirect_to admin_dynamic_array_dynamic_array_items_path(@array_item.dynamic_array)
+  end
+
+
+protected
+
+  def load_array
+    @array = DynamicArray.find(params[:dynamic_array_id])
+  end
+
+  def load_array_items
+    @array_items = @array.dynamic_array_items.default_order
+  end
+
+  def load_array_item
+    @array_item = DynamicArrayItem.find(params[:id])
+  end
+
+  def load_new_array_item
+    @array_item = params[:dynamic_array_item].nil? ? @array.dynamic_array_items.new : @array.dynamic_array_items.new(params[:dynamic_array_item])
+  end
+
+  def load_form_action_new
+    @form_action = [:admin, @array, @array_item]
+  end
+
+  def load_form_action_edit
+    @form_action = [:admin, @array_item]
+  end
+
+end
