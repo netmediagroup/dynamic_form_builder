@@ -1,6 +1,6 @@
 class Admin::DynamicArrayItemsController < Admin::AdminController
-  before_filter :load_array, :only => [:index, :new, :create]
-  before_filter :load_array_items, :only => [:index]
+  before_filter :load_array, :only => [:index, :new, :create, :edit_sort]
+  before_filter :load_array_items, :only => [:index, :edit_sort]
   before_filter :load_array_item, :only => [:show, :edit, :update, :destroy]
   before_filter :load_new_array_item, :only => [:new, :create]
   before_filter :load_form_action_new, :only => [:new, :create]
@@ -40,6 +40,17 @@ class Admin::DynamicArrayItemsController < Admin::AdminController
     @array_item.destroy
     flash[:notice] = 'Array item was deleted.'
     redirect_to admin_dynamic_array_dynamic_array_items_path(@array_item.dynamic_array)
+  end
+
+  def edit_sort
+  end
+
+  def update_sort
+    params[:items_list].each_index do |i|
+      id = params[:items_list].fetch(i)
+      DynamicArrayItem.find(id).update_attribute('sort', i)
+    end
+    render :nothing => true
   end
 
 

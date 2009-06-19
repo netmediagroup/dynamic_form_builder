@@ -1,0 +1,8 @@
+<%= render_partial_if_exists "edit_sort_content_for" %>
+
+<ul id="fields_list" class="sort">
+<% @fields.each do |field| -%>
+  <li id="item_<%= field.id %>"><span class="sort_handle"><%= field.column_name %></span></li>
+<% end -%>
+</ul>
+<%= sortable_element('fields_list', :url => {:action => 'update_sort'}, :method => :put, :constraint => :vertical, :handle => 'sort_handle') %>

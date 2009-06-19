@@ -1,0 +1,8 @@
+<%= render_partial_if_exists "edit_sort_content_for" %>
+
+<ul id="items_list" class="sort">
+<% @array_items.each do |array_item| -%>
+  <li id="item_<%= array_item.id %>"><span class="sort_handle">Display: <%= array_item.item_display %> | Value: <%= array_item.item_value %></span></li>
+<% end -%>
+</ul>
+<%= sortable_element('items_list', :url => {:action => 'update_sort'}, :method => :put, :constraint => :vertical, :handle => 'sort_handle') %>
