@@ -36,7 +36,7 @@ class Admin::DynamicArraysController < Admin::AdminController
   def destroy
     @array.destroy
     flash[:notice] = 'Array was deleted.'
-    redirect_to admin_arrays_path
+    redirect_to admin_dynamic_arrays_path
   end
 
 
