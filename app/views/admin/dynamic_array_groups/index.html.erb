@@ -1,0 +1,18 @@
+<%= render_partial_if_exists "index_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="list">
+  <tr>
+    <th>Name</th>
+    <th>Label</th>
+    <th>Array</th>
+    <th>Select</th>
+  </tr>
+<% @array_groups.each do |array_group| -%>
+  <tr class="<%= cycle('odd','even') %>">
+    <td><%= array_group.name %></td>
+    <td><%= array_group.label %></td>
+    <td><%= array_group.dynamic_array.name %></td>
+    <td><%= link_to 'Select', admin_site_dynamic_field_dynamic_array_group_url(@site, @field, array_group) %></td>
+  </tr>
+<% end -%>
+</table>

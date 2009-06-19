@@ -1,0 +1,28 @@
+<%= render_partial_if_exists "show_content_for" %>
+
+<table cellpadding="0" cellspacing="0" class="show">
+  <tr>
+    <td class="label">Name</td>
+    <td class="value"><%= @array_group.name %></td>
+  </tr>
+  <tr>
+    <td class="label">Label</td>
+    <td class="value"><%= @array_group.label %></td>
+  </tr>
+  <tr>
+    <td class="label">Array</td>
+    <td class="value"><%= link_to @array_group.dynamic_array.name, admin_dynamic_array_path(@array_group.dynamic_array) %></td>
+  </tr>
+  <tr id="detail_created_at" style="display:none;">
+    <td class="label">Created</td>
+    <td class="value"><%= @array_group.created_at %></td>
+  </tr>
+  <tr id="detail_updated_at" style="display:none;">
+    <td class="label">Last Updated</td>
+    <td class="value"><%= @array_group.updated_at %></td>
+  </tr>
+</table>
+<%= link_to_function("more...", nil, :id => "more_link") do |page|
+  page.show('detail_created_at','detail_updated_at')
+  page['more_link'].hide
+end %>

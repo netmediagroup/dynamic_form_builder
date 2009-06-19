@@ -1,0 +1,8 @@
+<%= render_partial_if_exists "edit_sort_content_for" %>
+
+<ul id="groups_list" class="sort">
+<% @array_groups.each do |array_group| -%>
+  <li id="group_<%= array_group.id %>"><span class="sort_handle"><%= array_group.name %></span></li>
+<% end -%>
+</ul>
+<%= sortable_element('groups_list', :url => {:action => 'update_sort'}, :method => :put, :constraint => :vertical, :handle => 'sort_handle') %>

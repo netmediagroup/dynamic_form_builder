@@ -1,0 +1,22 @@
+<%= error_messages_for :array_group %>
+<% form_for @redirect_to_array_group do |form| %>
+
+<table cellpadding="0" cellspacing="0" class="edit">
+  <tr>
+    <td class="label"><%= form.label :name %></td>
+    <td class="value"><%= form.text_field :name %></td>
+  </tr>
+  <tr>
+    <td class="label"><%= form.label :label %></td>
+    <td class="value"><%= form.text_field :label %></td>
+  </tr>
+  <tr>
+    <td class="label"><%= form.label :dynamic_array_id, 'Array' %></td>
+    <td class="value"><%= form.select :dynamic_array_id, @arrays.map {|a| [a.name, a.id]}, :prompt => true %></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="submit"><%= submit_tag %></td>
+  </tr>
+</table>
+
+<% end %>

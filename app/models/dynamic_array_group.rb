@@ -8,6 +8,8 @@ class DynamicArrayGroup < ActiveRecord::Base
   validates_presence_of :dynamic_arrayable, :name
   validates_numericality_of :dynamic_array_id, :only_integer => true, :allow_nil => false, :greater_than => 0
 
+  before_create :set_sort
+
 
   def field_attributes
     {
@@ -22,6 +24,13 @@ class DynamicArrayGroup < ActiveRecord::Base
 
   def dynamic_arrayable_type=(sType)
     super(sType.to_s.classify.constantize.base_class.to_s) unless sType.blank?
+  end
+
+
+private
+
+  def set_sort
+    self.sort = self.dynamic_arrayable.dynamic_array_groups.count if self.sort.nil? || self.sort == 0
   end
 
 end
