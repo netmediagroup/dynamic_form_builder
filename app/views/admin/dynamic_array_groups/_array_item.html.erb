@@ -1,0 +1,3 @@
+<% domid = "item_#{array_item.id}" -%>
+<li id="<%= domid %>" class="<%= item_class %>"><span class="dnd_item_handle">Array: <%= array_item.dynamic_array.name %> | Display: <%= array_item.item_display %> | Value: <%= array_item.item_value %></span></li>
+<%= draggable_element(domid, :ghosting => true, :revert => true, :handle => "'dnd_item_handle'") %>

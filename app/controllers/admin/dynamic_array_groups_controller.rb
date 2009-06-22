@@ -53,6 +53,21 @@ class Admin::DynamicArrayGroupsController < ApplicationController
     render :nothing => true
   end
 
+  def show_defaults
+  end
+
+  def add_default
+    @field.fieldable.dynamic_fieldable_default_array_items.create(:dynamic_array_item_id => params[:item])
+    load_defaults
+    render :partial => 'defaults', :layout => false
+  end
+
+  def remove_default
+    @field.fieldable.dynamic_fieldable_default_array_items.find_by_dynamic_array_item_id(params[:item]).destroy
+    load_defaults
+    render :partial => 'defaults', :layout => false
+  end
+
 
 protected
 
@@ -74,6 +89,11 @@ protected
 
   def load_arrays
     @arrays = DynamicArray.all(:order => 'name ASC')
+  end
+
+  def load_defaults
+    @default_array_items = @field.fieldable.default_items
+    @remaining_array_items = @field.fieldable.array_items - @default_array_items
   end
 
   def load_redirect_to_array_group

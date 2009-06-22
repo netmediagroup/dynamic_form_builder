@@ -1,0 +1,31 @@
+<div id="not-default-items-container" class="dnd-container">
+  <h3>Array Items</h3>
+  <div id="remaining_array_items" class="dnd-items">
+    <ul>
+      <%= render :partial => 'array_item', :collection => @remaining_array_items, :locals => {:item_class => 'remaining_array_item'} %>
+    </ul>
+  </div>
+</div>
+<%= drop_receiving_element('remaining_array_items', 
+  :accept => 'default_array_item',
+  :hoverclass => 'item_hover',
+  :with => "'item=' + encodeURIComponent(element.id.split('_').last())",
+  :url => remove_default_admin_site_dynamic_field_dynamic_array_groups_path(@site, @field),
+  :update => 'field-items-container'
+) %>
+
+<div id="default-items-container" class="dnd-container">
+  <h3>Default Items</h3>
+  <div id="default_array_items" class="dnd-items">
+    <ul>
+      <%= render :partial => 'array_item', :collection => @default_array_items, :locals => {:item_class => 'default_array_item'} %>
+    </ul>
+  </div>
+</div>
+<%= drop_receiving_element('default_array_items', 
+  :accept => 'remaining_array_item',
+  :hoverclass => 'item_hover',
+  :with => "'item=' + encodeURIComponent(element.id.split('_').last())",
+  :url => add_default_admin_site_dynamic_field_dynamic_array_groups_path(@site, @field),
+  :update => 'field-items-container'
+) %>
