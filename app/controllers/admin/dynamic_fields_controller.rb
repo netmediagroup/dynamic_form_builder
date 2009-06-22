@@ -55,7 +55,7 @@ class Admin::DynamicFieldsController < ApplicationController
   def destroy
     @field.destroy
     flash[:notice] = 'Field was deleted.'
-    redirect_to admin_dynamic_form_path(@field.dynamic_form)
+    redirect_to admin_dynamic_form_dynamic_fields_path(@field.dynamic_form)
   end
 
   def change_type
