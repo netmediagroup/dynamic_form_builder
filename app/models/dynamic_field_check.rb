@@ -50,7 +50,7 @@ class DynamicFieldCheck < ActiveRecord::Base
   end
 
   def check_message
-    if self.custom_message
+    unless self.custom_message.blank?
       return self.custom_message
     else
       msg = case self.check_type
