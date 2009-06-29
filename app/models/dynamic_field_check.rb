@@ -15,6 +15,7 @@ class DynamicFieldCheck < ActiveRecord::Base
 
 
   def check_field(field_value)
+    field_value = formatted_value(field_value)
     case self.check_type
       when 'array_true'
         !field_value.nil? && !self.value_array.has_item_value?(field_value).nil?
@@ -85,6 +86,13 @@ class DynamicFieldCheck < ActiveRecord::Base
       when :too_short    then "is too short (minimum is #{self.check_value} characters)"
       when :wrong_length then "is the wrong length (should be #{self.check_value} characters)"
     end
+  end
+
+  def formatted_value(field_value)
+    unless self.format_match.blank? || self.format_replace.blank?
+      field_value.gsub!(Regexp.new(self.format_match), self.format_replace)
+    end
+    field_value
   end
 
 
