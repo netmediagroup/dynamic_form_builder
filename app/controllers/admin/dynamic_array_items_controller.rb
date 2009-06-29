@@ -1,5 +1,5 @@
 class Admin::DynamicArrayItemsController < Admin::AdminController
-  before_filter :load_array, :only => [:index, :new, :create, :edit_sort]
+  before_filter :load_array, :only => [:index, :new, :create, :edit_sort, :new_items, :create_items]
   before_filter :load_array_items, :only => [:index, :edit_sort]
   before_filter :load_array_item, :only => [:show, :edit, :update, :destroy]
   before_filter :load_new_array_item, :only => [:new, :create]
@@ -51,6 +51,17 @@ class Admin::DynamicArrayItemsController < Admin::AdminController
       DynamicArrayItem.find(id).update_attribute('sort', i)
     end
     render :nothing => true
+  end
+
+  def new_items
+  end
+
+  def create_items
+    items = params[:items].split("\r\n").collect{|i| i.split("\t")}
+    items.each do |item|
+      @array.dynamic_array_items.create(:item_display => item[0], :item_value => item[1]) if item.size == 2
+    end
+    redirect_to admin_dynamic_array_dynamic_array_items_path(@array)
   end
 
 

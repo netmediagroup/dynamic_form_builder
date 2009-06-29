@@ -1,0 +1,15 @@
+<%= render_partial_if_exists "new_items_content_for" %>
+
+<% form_tag create_items_admin_dynamic_array_dynamic_array_items_path(@array) do %>
+
+<table cellpadding="0" cellspacing="0" class="edit">
+  <tr>
+    <td class="label"><%= label_tag :items %></td>
+    <td class="value"><%= text_area_tag :items, nil, :rows => 30, :cols => 80 %></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="submit"><%= submit_tag %></td>
+  </tr>
+</table>
+
+<% end %>
