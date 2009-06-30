@@ -18,6 +18,10 @@
     <td class="value"><%= @field_check.custom_message %></td>
   </tr>
   <tr>
+    <td class="label">Case Sensitive</td>
+    <td class="value"><%= @field.case_sensitive? ? 'Yes' : 'No' %></td>
+  </tr>
+  <tr>
     <td class="label">Format Match</td>
     <td class="value"><%= @field_check.format_match %></td>
   </tr>

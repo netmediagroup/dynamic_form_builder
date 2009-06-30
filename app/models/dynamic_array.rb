@@ -5,8 +5,8 @@ class DynamicArray < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  def has_item_value?(value)
-    dynamic_array_items.detect{|dynamic_array_item| dynamic_array_item.has_item_value?(value)}
+  def has_item_value?(value, case_sensitive=true)
+    dynamic_array_items.detect{|dynamic_array_item| dynamic_array_item.has_item_value?(value, case_sensitive)}
   end
 
 end

@@ -11,8 +11,8 @@ class DynamicArrayItem < ActiveRecord::Base
   before_create :set_sort
 
 
-  def has_item_value?(value)
-    value.to_s == self.item_value.to_s
+  def has_item_value?(value, case_sensitive=true)
+    case_sensitive == false ? value.to_s.downcase == self.item_value.to_s.downcase : value.to_s == self.item_value.to_s
   end
 
   def field_attributes

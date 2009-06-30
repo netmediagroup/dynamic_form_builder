@@ -43,6 +43,7 @@ class DynamicField < ActiveRecord::Base
     {
       :required => self.required,
       :column_name => self.column_name,
+      :input_name => params['form_token'],
       :label => self.label,
       :display => self.display_field?(params),
       :field_type => self.fieldable_type.gsub(/^Dynamic/, '').underscore,
