@@ -1,8 +1,12 @@
 <tr>
-  <td class="label"><%= label :fieldable, :combine_option_groups %></td>
-  <td class="value"><%= check_box_tag 'fieldable[combine_option_groups]', '1', @field && @field.fieldable.combine_option_groups? %></td>
+  <td class="label"><%= label :fieldable, :default_checked %></td>
+  <td class="value"><%= check_box 'fieldable', 'default_checked', :checked => @field && @field.fieldable.default_checked? %></td>
 </tr>
 <tr>
-  <td class="label"><%= label :fieldable, :missing_value_error %></td>
-  <td class="value"><%= text_field_tag 'fieldable[missing_value_error]', @field.nil? ? nil : @field.fieldable.missing_value_error %></td>
+  <td class="label"><%= label :fieldable, :input_label %></td>
+  <td class="value"><%= text_field_tag 'fieldable[input_label]', @field.nil? ? nil : @field.fieldable.input_label %></td>
+</tr>
+<tr>
+  <td class="label"><%= label :fieldable, :input_value %></td>
+  <td class="value"><%= text_field_tag 'fieldable[input_value]', @field.nil? ? nil : @field.fieldable.input_value %></td>
 </tr>

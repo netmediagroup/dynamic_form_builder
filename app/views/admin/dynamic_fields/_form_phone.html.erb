@@ -1,8 +1,8 @@
 <tr>
   <td class="label"><%= label :fieldable, :separate_inputs %></td>
-  <td class="value"><%= check_box_tag 'fieldable[separate_inputs]', '1', @field && @field.fieldable.separate_inputs? %></td>
+  <td class="value"><%= check_box 'fieldable', 'separate_inputs', :checked => @field && @field.fieldable.separate_inputs? %></td>
 </tr>
 <tr>
   <td class="label"><%= label :fieldable, :dividers %></td>
-  <td class="value"><%= check_box_tag 'fieldable[dividers]', '1', @field && @field.fieldable.dividers? %></td>
+  <td class="value"><%= check_box 'fieldable', 'dividers', :checked => @field && @field.fieldable.dividers? %></td>
 </tr>

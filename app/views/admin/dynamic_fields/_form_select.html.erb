@@ -4,11 +4,11 @@
 </tr>
 <tr>
   <td class="label"><%= label :fieldable, :combine_option_groups %></td>
-  <td class="value"><%= check_box_tag 'fieldable[combine_option_groups]', '1', @field && @field.fieldable.combine_option_groups? %></td>
+  <td class="value"><%= check_box 'fieldable', 'combine_option_groups', :checked => @field && @field.fieldable.combine_option_groups? %></td>
 </tr>
 <tr>
   <td class="label"><%= label :fieldable, :allow_blank %></td>
-  <td class="value"><%= check_box_tag 'fieldable[allow_blank]', '1', @field && @field.fieldable.allow_blank? %></td>
+  <td class="value"><%= check_box 'fieldable', 'allow_blank', :checked => @field && @field.fieldable.allow_blank? %></td>
 </tr>
 <tr>
   <td class="label"><%= label :fieldable, :prompt %></td>

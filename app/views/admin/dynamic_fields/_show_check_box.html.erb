@@ -1,8 +1,12 @@
 <tr>
-  <td class="label">Combine Option Groups</td>
-  <td class="value"><%= @field.fieldable.combine_option_groups? ? 'Yes' : 'No' %></td>
+  <td class="label">Default Checked</td>
+  <td class="value"><%= @field.fieldable.default_checked? ? 'Yes' : 'No' %></td>
 </tr>
 <tr>
-  <td class="label">Missing Value Error</td>
-  <td class="value"><%= @field.fieldable.missing_value_error %></td>
+  <td class="label">Input Label</td>
+  <td class="value"><%= @field.fieldable.input_label %></td>
+</tr>
+<tr>
+  <td class="label">Input Value</td>
+  <td class="value"><%= @field.fieldable.input_value %></td>
 </tr>

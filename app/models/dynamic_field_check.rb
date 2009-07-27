@@ -27,7 +27,7 @@ class DynamicFieldCheck < ActiveRecord::Base
       when 'custom_false'
         field_value.nil? || check_custom(field_value)
       when 'email'
-        !field_value.nil? && !check_custom(field_value, (self.check_value || /\A[\w-]+(\.[\w-]+)*@([\w-]+(\.[\w-]+)*?\.[a-zA-Z]{2,6}|(\d{1,3}\.){3}\d{1,3})(:\d{4})?\Z/))
+        !field_value.nil? && !check_custom(field_value, (self.check_value.blank? ? /\A[\w-]+(\.[\w-]+)*@([\w-]+(\.[\w-]+)*?\.[a-zA-Z]{2,6}|(\d{1,3}\.){3}\d{1,3})(:\d{4})?\Z/ : self.check_value))
       when 'length'
         !field_value.nil? && field_value.length == self.check_value.to_i
       when 'min_length'
@@ -35,7 +35,7 @@ class DynamicFieldCheck < ActiveRecord::Base
       when 'max_length'
         !field_value.nil? && field_value.length <= self.check_value.to_i
       when 'numerical'
-        !field_value.nil? && !field_value.match(self.check_value || /\A[+\-]?\d+\Z/).nil?
+        !field_value.nil? && !field_value.match(self.check_value.blank? ? /\A[+\-]?\d+\Z/ : self.check_value).nil?
       when 'split_true'
         !field_value.nil? && check_split(field_value)
       when 'split_false'

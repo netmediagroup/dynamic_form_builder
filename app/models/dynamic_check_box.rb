@@ -3,22 +3,11 @@ class DynamicCheckBox < ActiveRecord::Base
 
   has_one :dynamic_field, :as => :fieldable
 
-  has_many :dynamic_array_groups, :as => :dynamic_arrayable, :dependent => :destroy
-  # has_many :dynamic_arrays, :through => :dynamic_array_groups, :order => 'sort ASC'
-  has_many :dynamic_fieldable_default_array_items, :as => :defaultable, :dependent => :destroy
-  has_many :default_items, :through => :dynamic_fieldable_default_array_items, :source => :dynamic_array_item
-
+  validates_presence_of :input_value
 
   def field_attributes(params={})
-    {
-      :combine_option_groups => self.combine_option_groups,
-      :option_groups => self.dynamic_array_groups.default_order.inject([]) {|groups, dynamic_array_group| groups << dynamic_array_group.field_attributes; groups},
-      :default_options => self.default_items.default_order.inject([]) {|items, default_item| items << default_item.field_attributes; items}
-    }
-  end
-
-  def has_option_value?(value)
-    dynamic_array_groups.detect{|group| group.has_item_value?(value)}
+    value = self.field_value(params)
+    {:checked => (value.nil? ? self.default_checked? : (value == self.input_value ? true : false)), :input_label => self.input_label, :input_value => self.input_value}
   end
 
 end
