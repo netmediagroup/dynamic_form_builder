@@ -20,6 +20,7 @@ class DynamicField < ActiveRecord::Base
 
   validates_presence_of :dynamic_form_id, :fieldable, :column_name
   validates_uniqueness_of :column_name, :scope => :dynamic_form_id
+  validates_format_of :column_name, :with => /\A[A-Za-z]\w+[A-Za-z0-9]\Z/, :allow_nil => true, :allow_blank => true
   validates_inclusion_of :active, :required, :check_duplication, :in => [true, false]
   validates_inclusion_of :fieldable_type, :in => FIELDABLE_TYPES
   validates_inclusion_of :column_type, :in => COLUMN_TYPES
