@@ -1,8 +1,6 @@
 class DynamicCheckBox < ActiveRecord::Base
   include DynamicFieldableCommon
 
-  has_one :dynamic_field, :as => :fieldable
-
   validates_presence_of :input_value
 
   def field_attributes(params={})

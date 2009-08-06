@@ -1,7 +1,5 @@
 class DynamicPhone < ActiveRecord::Base
-  # include DynamicFieldableCommon
-
-  has_one :dynamic_field, :as => :fieldable
+  include DynamicFieldableCommon
 
   def field_attributes(params={})
     attrs = {:separate_inputs => self.separate_inputs, :dividers => self.dividers}

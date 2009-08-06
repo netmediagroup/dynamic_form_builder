@@ -2,7 +2,7 @@ class DynamicField < ActiveRecord::Base
   FIELDABLE_TYPES = ['DynamicCheckBox','DynamicHiddenField','DynamicPhone','DynamicRadioButton','DynamicSelect','DynamicTextArea','DynamicTextField']
   COLUMN_TYPES = ['Binary','Boolean','Date','Datetime','Decimal','Float','Integer','String','Text','Time','Timestamp']
 
-  belongs_to :dynamic_form
+  belongs_to :dynamic_form, :touch => true
   belongs_to :fieldable, :polymorphic => true, :dependent => :destroy
   has_many :dynamic_field_checks, :dependent => :destroy
   has_many :dynamic_field_formats, :dependent => :destroy

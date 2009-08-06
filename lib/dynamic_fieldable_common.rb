@@ -1,5 +1,10 @@
 module DynamicFieldableCommon
 
+  def self.included(base)
+    base.has_one :dynamic_field, :as => :fieldable
+    base.after_save :touch_field
+  end
+
   def field_value(params={})
     params[self.dynamic_field.column_name.to_s]
   end
@@ -12,6 +17,12 @@ module DynamicFieldableCommon
       end
     end
     array_items
+  end
+
+protected
+
+  def touch_field
+    self.dynamic_field.touch unless self.dynamic_field.nil?
   end
 
 end

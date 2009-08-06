@@ -1,5 +1,5 @@
 class DynamicArrayGroup < ActiveRecord::Base
-  belongs_to :dynamic_arrayable, :polymorphic => true
+  belongs_to :dynamic_arrayable, :polymorphic => true, :touch => true
   belongs_to :dynamic_array
   has_many :dynamic_array_items, :through => :dynamic_array
 

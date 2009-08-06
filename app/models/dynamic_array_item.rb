@@ -1,5 +1,5 @@
 class DynamicArrayItem < ActiveRecord::Base
-  belongs_to :dynamic_array
+  belongs_to :dynamic_array, :touch => true
 
   named_scope :default_order, :order => 'sort ASC'
 
