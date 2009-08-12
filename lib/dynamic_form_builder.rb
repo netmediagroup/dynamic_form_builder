@@ -114,6 +114,31 @@ class DynamicFormBuilder
     end
   end
 
+  def empty?
+    self.fields.each do |field|
+      return false if !field[:value].blank? || !default_field_value?(field)
+    end
+    return true
+  end
+
+  def default_field_value?(field)
+    return case field[:field_type]
+    when 'text_field', 'text_area'then (field[:value] == field[:prompt]) || (field[:value].blank? && field[:prompt].blank?)
+    when 'select','radio_button' then (field[:value] || []).sort == (field[:default_options].first || {}).map{|k,v| v}.sort
+    when 'check_box' then false
+    when 'phone' then field[:value].blank?
+    when 'hidden_field' then true
+    else false
+    end
+  end
+
+  def has_bad_words?
+    self.fields.each do |field|
+      return true unless InputValidator.valid_words?(field[:value])
+    end
+    return false
+  end
+
   def errors
     @errors ||= ActiveRecord::Errors.new(self)
   end
