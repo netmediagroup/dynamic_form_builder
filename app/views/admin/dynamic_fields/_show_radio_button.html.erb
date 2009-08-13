@@ -1,4 +1,8 @@
 <tr>
+  <td class="label">Default Item</td>
+  <td class="value"><%= "#{@field.fieldable.default_item.item_display} (#{@field.fieldable.default_item.item_value})" if @field.fieldable.default_item %></td>
+</tr>
+<tr>
   <td class="label">Combine Option Groups</td>
   <td class="value"><%= @field.fieldable.combine_option_groups? ? 'Yes' : 'No' %></td>
 </tr>

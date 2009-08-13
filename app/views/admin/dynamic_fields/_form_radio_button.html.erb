@@ -1,8 +1,12 @@
 <tr>
+  <td class="label"><%= label :fieldable, :default_item_id %></td>
+  <td class="value"><%= select_tag 'fieldable[default_item_id]', options_for_select(['']) + options_from_collection_for_select(@field.fieldable.array_items, 'id', 'item_display', @field.fieldable.default_item_id) %></td>
+</tr>
+<tr>
   <td class="label"><%= label :fieldable, :combine_option_groups %></td>
   <td class="value"><%= check_box 'fieldable', 'combine_option_groups', :checked => @field && @field.fieldable.combine_option_groups? %></td>
 </tr>
 <tr>
   <td class="label"><%= label :fieldable, :missing_value_error %></td>
-  <td class="value"><%= text_field_tag 'fieldable[missing_value_error]', @field.nil? ? nil : @field.fieldable.missing_value_error %></td>
+  <td class="value"><%= text_field_tag 'fieldable[missing_value_error]', @field.nil? ? nil : @field.fieldable.missing_value_error, :size => 50 %></td>
 </tr>
