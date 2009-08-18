@@ -116,7 +116,7 @@ class DynamicFormBuilder
 
   def empty?
     self.fields.each do |field|
-      return false if !field[:value].blank? || !default_field_value?(field)
+      return false if !field[:value].blank? && !default_field_value?(field)
     end
     return true
   end
@@ -124,7 +124,7 @@ class DynamicFormBuilder
   def default_field_value?(field)
     return case field[:field_type]
       when 'text_field', 'text_area' then (field[:value] == field[:prompt]) || (field[:value].blank? && field[:prompt].blank?)
-      when 'select','radio_button' then (field[:value] || []).sort == (field[:default_options].first || {}).map{|k,v| v}.sort
+      when 'select','radio_button' then (field[:default_option].blank? ? false : field[:value] == field[:default_option].item_value)
       when 'check_box' then false
       when 'phone' then field[:value].blank?
       when 'hidden_field' then true
