@@ -3,4 +3,4 @@
   when 'split_true','split_false' then text_area_tag 'dynamic_field_check[check_value]', @field_check.value_split.nil? ? '' : @field_check.value_split.join("\n"), {:rows => 5, :cols => 50}
   when 'phone_lookup','phone_validity' then ''
   else text_field_tag 'dynamic_field_check[check_value]', @field_check.check_value, :size => 30
-end %>
+end unless @field_check.check_type.nil? %>

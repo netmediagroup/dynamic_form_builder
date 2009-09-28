@@ -4,11 +4,11 @@
 <table cellpadding="0" cellspacing="0" class="edit">
   <tr>
     <td class="label"><%= form.label :check_for, 'For' %></td>
-    <td class="value"><%= form.select(:check_for, DynamicFieldCheck::CHECK_FORS.map {|t| [t.titleize, t]}, :prompt => true) %></td>
+    <td class="value"><%= form.select(:check_for, DynamicFieldCheck::CHECK_FORS.map {|t| [t.titleize, t]}, {:prompt => true}, {:onchange => "Element.update('field_check_value', ''); " + remote_function(:url => @field_check.new_record? ? change_for_admin_site_dynamic_field_dynamic_field_checks_path(@site, @field) : change_for_admin_site_dynamic_field_dynamic_field_check_path(@site, @field, @field_check), :update => 'field_check_type', :with => "'f=' + this.value")}) %></td>
   </tr>
   <tr>
     <td class="label"><%= form.label :check_type, 'Type' %></td>
-    <td class="value"><%= form.select(:check_type, DynamicFieldCheck::CHECK_TYPES.map {|t| [t, t]}, {:prompt => true}, {:onchange => remote_function(:url => @field_check.new_record? ? change_type_admin_site_dynamic_field_dynamic_field_checks_path(@site, @field) : change_type_admin_site_dynamic_field_dynamic_field_check_path(@site, @field, @field_check), :update => 'field_check_value', :with => "'t=' + this.value")}) %></td>
+    <td class="value" id="field_check_type"><%= render "form_check_type" %></td>
   </tr>
   <tr>
     <td class="label"><%= form.label :check_value, 'Value' %></td>

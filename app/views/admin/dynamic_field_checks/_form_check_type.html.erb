@@ -1,0 +1,6 @@
+<%= select_tag('dynamic_field_check[check_type]', options_for_select(['']) + options_for_select(case @field_check.check_for
+  when 'qualify' then DynamicFieldCheck::QUALIFYING_TYPES
+  when 'validate' then DynamicFieldCheck::VALIDATING_TYPES
+  end, @field_check.check_value),
+{:onchange => remote_function(:url => @field_check.new_record? ? change_type_admin_site_dynamic_field_dynamic_field_checks_path(@site, @field) : change_type_admin_site_dynamic_field_dynamic_field_check_path(@site, @field, @field_check), :update => 'field_check_value', :with => "'t=' + this.value")}
+) unless @field_check.check_for.nil? %>

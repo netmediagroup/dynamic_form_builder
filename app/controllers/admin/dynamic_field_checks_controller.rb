@@ -41,6 +41,16 @@ class Admin::DynamicFieldChecksController < ApplicationController
     redirect_to admin_dynamic_field_dynamic_field_checks_path(@field)
   end
 
+  def change_for
+    unless params[:f].blank?
+      params[:id].nil? ? (@field_check = @field.dynamic_field_checks.new) : load_field_check
+      @field_check.check_for = params[:f]
+      render :partial => "form_check_type"
+    else
+      render :nothing => true
+    end
+  end
+
   def change_type
     unless params[:t].blank?
       params[:id].nil? ? (@field_check = @field.dynamic_field_checks.new) : load_field_check

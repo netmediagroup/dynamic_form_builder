@@ -2,7 +2,7 @@ class DynamicFieldCheck < ActiveRecord::Base
   CHECK_FORS = ['qualify','validate'].freeze
   QUALIFYING_TYPES = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','numerical','split_true','split_false'].freeze
   VALIDATING_TYPES = ['array_true','array_false','custom_true','custom_false','email','length','max_length','min_length','numerical','phone_lookup','phone_validity','split_true','split_false'].freeze
-  CHECK_TYPES = (QUALIFYING_TYPES + VALIDATING_TYPES).uniq.sort.freeze
+  # CHECK_TYPES = (QUALIFYING_TYPES + VALIDATING_TYPES).uniq.sort.freeze
   LAST_CHECK_TYPES = ['phone_validity','phone_lookup'].freeze # In order of priority.
   CHECK_TYPES_THAT_REQUIRE_VALUE = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','split_true','split_false'].freeze
 
@@ -16,7 +16,8 @@ class DynamicFieldCheck < ActiveRecord::Base
 
   validates_presence_of :dynamic_field
   validates_inclusion_of :check_for, :in => CHECK_FORS
-  validates_inclusion_of :check_type, :in => CHECK_TYPES
+  validates_inclusion_of :check_type, :in => QUALIFYING_TYPES, :if => Proc.new {|dfc| dfc.check_for == 'qualify' }
+  validates_inclusion_of :check_type, :in => VALIDATING_TYPES, :if => Proc.new {|dfc| dfc.check_for == 'validate' }
   validates_presence_of :check_value, :if => :requires_value
   validates_inclusion_of :case_sensitive, :in => [true, false]
 
