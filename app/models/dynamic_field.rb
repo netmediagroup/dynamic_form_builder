@@ -47,7 +47,7 @@ class DynamicField < ActiveRecord::Base
       :input_name => params['form_token'],
       :label => self.label,
       :display => self.display_field?(params),
-      :field_type => self.fieldable_type.gsub(/^Dynamic/, '').underscore,
+      :field_type => self.field_type,
       :value => self.fieldable.field_value(params),#self.format(self.fieldable.field_value(params), 'display'), # I'm not sure now if formatting will be used.
       :column_type => self.column_type
     }.merge(self.fieldable.field_attributes(params))

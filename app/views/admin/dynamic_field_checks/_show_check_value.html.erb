@@ -1,0 +1,5 @@
+<%= case field_check.check_type
+  when 'array_true','array_false' then field_check.value_array.name
+  when 'split_true','split_false' then field_check.value_split.join('<br>')
+  else field_check.check_value
+end %>

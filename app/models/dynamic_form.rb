@@ -3,6 +3,8 @@ class DynamicForm < ActiveRecord::Base
   has_many :dynamic_fields, :include => :fieldable
   has_many :leads, :foreign_key => 'form_id'
 
+  named_scope :active, :conditions => ["active = ?", true]
+
   validates_presence_of :name
 
   after_update :expire_webservice_cache

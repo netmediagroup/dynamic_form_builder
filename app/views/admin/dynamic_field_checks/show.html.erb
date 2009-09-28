@@ -11,7 +11,7 @@
   </tr>
   <tr>
     <td class="label">Value</td>
-    <td class="value"><%= @field_check.check_value %></td>
+    <td class="value"><%= render :partial => "show_check_value", :locals => {:field_check => @field_check} %></td>
   </tr>
   <tr>
     <td class="label">Custom Message</td>

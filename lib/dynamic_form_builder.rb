@@ -30,7 +30,8 @@ class DynamicFormBuilder
 
   def duplication_queries
     if @duplication_queries.nil?
-      @duplication_queries = self.duplication_attributes.inject([]) {|dup_attrs, dup_attr| dup_attrs << "#{dup_attr[0].to_s} = '#{dup_attr[1].to_s}'"; dup_attrs }
+      # @duplication_queries = self.duplication_attributes.inject([]) {|dup_attrs, dup_attr| dup_attrs << ActiveRecord::Base.send(:sanitize_sql_for_conditions, ["#{dup_attr[0].to_s} = ?", dup_attr[1].to_s]); dup_attrs }
+      @duplication_queries = self.duplication_attributes.inject([]) {|dup_attrs, dup_attr| dup_attrs << ActiveRecord::Base.send(:sanitize_sql_for_assignment, ["#{dup_attr[0].to_s} = ?", dup_attr[1].to_s]); dup_attrs }
       @duplication_queries << "created_at >= '#{self.form.duplication_days.days.ago.to_s(:db)}'" if !@duplication_queries.empty? && !self.form.duplication_days.blank? && self.form.duplication_days > 0
     end
     @duplication_queries
@@ -85,9 +86,17 @@ class DynamicFormBuilder
             errors.add(field.column_name, msg)
           end
         end
+
         field.dynamic_field_checks.for_validation.each do |validation_check|
           errors.add(field.column_name, validation_check.check_message) unless validation_check.check_field(field_value)
         end
+
+        field.dynamic_field_checks.for_last_validation.each do |validation_check|
+          unless validation_check.check_field(field_value)
+            errors.add(field.column_name, validation_check.check_message)
+            break
+          end
+        end if errors.instance_variable_get("@errors").has_key?(field.column_name) == false
       end
     end
   end
