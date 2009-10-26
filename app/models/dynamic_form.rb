@@ -4,6 +4,7 @@ class DynamicForm < ActiveRecord::Base
   has_many :leads, :foreign_key => 'form_id'
 
   named_scope :active, :conditions => ["active = ?", true]
+  named_scope :named_order, :order => 'name ASC'
 
   validates_presence_of :name
 

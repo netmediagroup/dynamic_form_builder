@@ -3,7 +3,7 @@ class DynamicFieldCheck < ActiveRecord::Base
   QUALIFYING_TYPES = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','numerical','split_true','split_false'].freeze
   VALIDATING_TYPES = ['array_true','array_false','custom_true','custom_false','email','length','max_length','min_length','numerical','phone_lookup','phone_validity','split_true','split_false'].freeze
   # CHECK_TYPES = (QUALIFYING_TYPES + VALIDATING_TYPES).uniq.sort.freeze
-  LAST_CHECK_TYPES = ['phone_validity','phone_lookup'].freeze # In order of priority.
+  LAST_CHECK_TYPES = ['phone_validity','phone_lookup'].freeze # In order of priority. These are done last and are only checked if there are no errors.
   CHECK_TYPES_THAT_REQUIRE_VALUE = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','split_true','split_false'].freeze
 
   SPLIT_SEPARATOR = '|'
@@ -50,8 +50,9 @@ class DynamicFieldCheck < ActiveRecord::Base
       when 'array_true','array_false' then value_array.dynamic_array_items.map{|i| i.item_value}.join('<br>')
       when 'custom_true','custom_false','max_length','min_length','length' then self.check_value
       when 'email' then value_email
-      when 'numerical','phone_lookup','phone_validity' then ''
+      when 'phone_validity' then 'A common set of invalid phone number combinations.'
       when 'split_true','split_false' then value_split.join('<br>')
+      when 'numerical','phone_lookup' then ''
     end
   end
 
