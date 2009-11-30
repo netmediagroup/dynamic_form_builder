@@ -44,7 +44,7 @@ class Admin::DynamicFormsController < ApplicationController
 protected
 
   def load_forms
-    @forms = DynamicForm.all(:order => 'name ASC')
+    @forms = DynamicForm.named_order.find(:all, :order => 'name ASC')
   end
 
   def load_form

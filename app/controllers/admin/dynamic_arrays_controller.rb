@@ -1,4 +1,4 @@
-class Admin::DynamicArraysController < Admin::AdminController
+class Admin::DynamicArraysController < ApplicationController
   before_filter :load_arrays, :only => [:index]
   before_filter :load_array, :only => [:show, :edit, :update, :destroy]
   before_filter :load_new_array, :only => [:new, :create]

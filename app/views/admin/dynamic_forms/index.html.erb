@@ -6,7 +6,7 @@
     <th>Active</th>
     <th>Select</th>
   </tr>
-<% @forms.named_order.each do |dynamic_form| -%>
+<% @forms.each do |dynamic_form| -%>
   <tr class="<%= cycle('odd','even') %>">
     <td><%= dynamic_form.name %></td>
     <td align="center"><%= dynamic_form.active? ? "Yes" : "No" %></td>

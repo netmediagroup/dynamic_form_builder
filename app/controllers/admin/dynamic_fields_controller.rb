@@ -1,8 +1,8 @@
 class Admin::DynamicFieldsController < ApplicationController
-  before_filter :load_form, :only => [:index, :new, :create]
+  before_filter :load_form, :only => [:index, :new, :create, :change_type, :edit_sort]
   before_filter :load_fields, :only => [:index, :edit_sort]
   before_filter :load_field, :only => [:show, :edit, :update, :destroy]
-  before_filter :load_new_field, :only => [:new, :create]
+  before_filter :load_new_field, :only => [:new, :create, :change_type]
   before_filter :load_form_action_new, :only => [:new, :create]
   before_filter :load_form_action_edit, :only => [:edit, :update]
 
@@ -60,6 +60,7 @@ class Admin::DynamicFieldsController < ApplicationController
 
   def change_type
     unless params[:t].blank?
+      @field.fieldable = params[:t].classify.constantize.new
       render :partial => "form_#{params[:t].sub('Dynamic','').underscore}"
     else
       render :nothing => true
