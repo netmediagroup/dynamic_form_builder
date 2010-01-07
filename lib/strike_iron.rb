@@ -1,10 +1,10 @@
 require 'soap/wsdlDriver'
 class StrikeIron
+  # The constants USER_ID and PASSWORD must be provided in your own script StrikeIronConnect.
+  include StrikeIronConnect
+
   # WSDL_PREFIX = 'http://ws.strikeiron.com/'
   WSDL_PREFIX = 'http://wsparam.strikeiron.com/'
-
-  USER_ID = 'dfoy@affiliatecrew.com'
-  PASSWORD = 'bulletbug'
 
   def self.validate_and_normalize_phone(phone)
     phone.gsub!(/\D/,'')
