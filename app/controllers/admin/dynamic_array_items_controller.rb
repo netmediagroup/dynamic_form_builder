@@ -1,5 +1,5 @@
 class Admin::DynamicArrayItemsController < ApplicationController
-  before_filter :load_array, :only => [:index, :new, :create, :edit_sort, :new_items, :create_items]
+  before_filter :load_array, :only => [:index, :new, :create, :edit_sort, :new_items, :create_items, :replace_items, :destroy_and_create_items]
   before_filter :load_array_items, :only => [:index, :edit_sort]
   before_filter :load_array_item, :only => [:show, :edit, :update, :destroy]
   before_filter :load_new_array_item, :only => [:new, :create]
@@ -62,6 +62,16 @@ class Admin::DynamicArrayItemsController < ApplicationController
       @array.dynamic_array_items.create(:item_display => item[0], :item_value => item[1]) if item.size == 2
     end
     redirect_to admin_dynamic_array_dynamic_array_items_path(@array)
+  end
+
+  def replace_items
+  end
+
+  def destroy_and_create_items
+    DynamicArrayItem.transaction do
+      @array.dynamic_array_items.destroy_all
+      create_items
+    end
   end
 
 

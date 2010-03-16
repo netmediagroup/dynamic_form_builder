@@ -26,6 +26,8 @@ protected
 
   def expire_webservice_cache
     ActionController::Base.new.expire_fragment %r{webservices/sites/\d*/forms/#{self.id}}
+
+    CacheControl.expire_form_cache(self.id) rescue nil
   end
 
 end

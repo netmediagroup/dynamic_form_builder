@@ -8,7 +8,7 @@
 <% @arrays.each do |array| -%>
   <tr class="<%= cycle('odd','even') %>">
     <td><%= array.name %></td>
-    <td><%= link_to 'Select', admin_dynamic_array_path(array) %></td>
+    <td align="center"><%= link_to 'Select', admin_dynamic_array_path(array) %></td>
   </tr>
 <% end -%>
 </table>

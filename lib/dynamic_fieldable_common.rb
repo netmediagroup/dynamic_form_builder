@@ -6,7 +6,11 @@ module DynamicFieldableCommon
   end
 
   def field_value(params={})
-    params[self.dynamic_field.column_name.to_s]
+    fieldable_value(params[self.dynamic_field.column_name.to_s])
+  end
+
+  def fieldable_value(value)
+    self.dynamic_field.column_type_value(value)
   end
 
   def array_items

@@ -80,6 +80,17 @@ class DynamicField < ActiveRecord::Base
     return self.label.empty? ? self.column_name : "\"#{self.label}\"";
   end
 
+  def column_type_value(value)
+    return case self.column_type
+    when 'Boolean'
+      if !value.nil? && (value.is_a?(TrueClass) || (value.is_a?(String) && (!(value =~ /true/i).nil? || value.to_i > 0)) || (value.is_a?(Integer) && value > 0))
+        true
+      elsif !value.nil? && (value.is_a?(FalseClass) || (value.is_a?(String) && (!(value =~ /false/i).nil? || value.to_i <= 0)) || (value.is_a?(Integer) && value <= 0))
+        false
+      end
+    else value
+    end
+  end
 
 private
 
