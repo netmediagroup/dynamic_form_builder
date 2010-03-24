@@ -6,8 +6,9 @@ class DynamicHiddenField < ActiveRecord::Base
   end
 
   def field_value(params={})
-    fieldable_value(params[self.dynamic_field.column_name.to_s] || self.default_value)
-    # fieldable_value(self.default_value)
+    field_value = params[self.dynamic_field.column_name.to_s] || self.default_value
+    field_value.strip! unless field_value.nil?
+    field_value
   end
 
 end

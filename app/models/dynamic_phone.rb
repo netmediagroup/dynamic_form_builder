@@ -25,10 +25,12 @@ class DynamicPhone < ActiveRecord::Base
   def field_value(params={})
     column_name = self.dynamic_field.column_name
 
-    value = params[column_name.to_s]
     if self.separate_inputs
       merged = (params["#{column_name}_area"].to_s + params["#{column_name}_prefix"].to_s + params["#{column_name}_suffix"].to_s)
       value = merged unless merged.blank?
+    else
+      value = params[column_name.to_s]
+      value.strip! unless value.nil?
     end
     return value
   end

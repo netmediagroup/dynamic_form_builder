@@ -6,10 +6,16 @@ module DynamicFieldableCommon
   end
 
   def field_value(params={})
-    fieldable_value(params[self.dynamic_field.column_name.to_s])
+    field_value = params[self.dynamic_field.column_name.to_s]
+    field_value.strip! unless field_value.nil?
+    field_value
   end
 
-  def fieldable_value(value)
+  def save_value(params={})
+    fieldable_save_value(self.field_value(params))
+  end
+
+  def fieldable_save_value(value)
     self.dynamic_field.column_type_value(value)
   end
 

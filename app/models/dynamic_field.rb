@@ -49,6 +49,7 @@ class DynamicField < ActiveRecord::Base
       :display => self.display_field?(params),
       :field_type => self.field_type,
       :value => self.fieldable.field_value(params),#self.format(self.fieldable.field_value(params), 'display'), # I'm not sure now if formatting will be used.
+      :save_value => self.fieldable.save_value(params),
       :column_type => self.column_type
     }.merge(self.fieldable.field_attributes(params))
   end
@@ -83,9 +84,9 @@ class DynamicField < ActiveRecord::Base
   def column_type_value(value)
     return case self.column_type
     when 'Boolean'
-      if !value.nil? && (value.is_a?(TrueClass) || (value.is_a?(String) && (!(value =~ /true/i).nil? || value.to_i > 0)) || (value.is_a?(Integer) && value > 0))
+      if !value.nil? && (value.is_a?(TrueClass) || (value.is_a?(String) && (!(value =~ /(true|yes)/i).nil? || value.to_i > 0)) || (value.is_a?(Integer) && value > 0))
         true
-      elsif !value.nil? && (value.is_a?(FalseClass) || (value.is_a?(String) && (!(value =~ /false/i).nil? || value.to_i <= 0)) || (value.is_a?(Integer) && value <= 0))
+      elsif !value.nil? && (value.is_a?(FalseClass) || (value.is_a?(String) && (!(value =~ /(false|no)/i).nil? || value.to_i <= 0)) || (value.is_a?(Integer) && value <= 0))
         false
       end
     else value
