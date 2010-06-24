@@ -7,7 +7,7 @@ module DynamicFieldableCommon
 
   def field_value(params={})
     field_value = params[self.dynamic_field.column_name.to_s]
-    field_value.strip! unless field_value.nil?
+    field_value.strip! if !field_value.nil? && field_value.is_a?(String)
     field_value
   end
 
