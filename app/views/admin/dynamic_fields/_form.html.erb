@@ -15,11 +15,17 @@
       <td class="label"><%= form.label :check_duplication %></td>
       <td class="value"><%= form.check_box :check_duplication %></td>
     </tr>
+<% if form.object.dynamic_form.use_multistep? -%>
+    <tr>
+      <td class="label"><%= form.label :step %></td>
+      <td class="value"><%= form.select(:step, (1..form.object.last_step_but_not_me+1)) %></td>
+    </tr>
+<% end -%>
     <tr>
       <td class="label"><%= form.label :column_name %></td>
       <td class="value"><%= form.text_field :column_name %></td>
     </tr>
-<% if @field.new_record? -%>
+<% if form.object.new_record? -%>
     <tr>
       <td class="label"><%= form.label :column_type %></td>
       <td class="value"><%= form.select(:column_type, DynamicField::COLUMN_TYPES.map {|t| [t, t]}, :prompt => true) %></td>
@@ -35,13 +41,13 @@
     </tr>
     <tr>
       <td class="label"><%= form.label :fieldable_type, 'Type' %></td>
-      <td class="value"><%= @field.new_record? ? form.select(:fieldable_type, DynamicField::FIELDABLE_TYPES.map {|t| [t.sub('Dynamic','').titleize, t]}, {:selected => @field.fieldable_type, :prompt => true}, {
-        :onchange => remote_function(:url => change_type_admin_site_dynamic_form_dynamic_fields_path(@site, @field.dynamic_form), :method => :put, :update => 'fieldable_details', :with => "'t=' + this.value")
-      }) : @field.field_type %></td>
+      <td class="value"><%= form.object.new_record? ? form.select(:fieldable_type, DynamicField::FIELDABLE_TYPES.map {|t| [t.sub('Dynamic','').titleize, t]}, {:selected => form.object.fieldable_type, :prompt => true}, {
+        :onchange => remote_function(:url => change_type_admin_site_dynamic_form_dynamic_fields_path(@site, form.object.dynamic_form), :method => :put, :update => 'fieldable_details', :with => "'t=' + this.value")
+      }) : form.object.field_type %></td>
     </tr>
   </thead>
   <tbody id="fieldable_details">
-<%= render "form_#{@field.field_type}" unless @field.field_type.blank? %>
+<%= render "form_#{form.object.field_type}" unless form.object.field_type.blank? %>
   </tbody>
   <tfoot>
     <tr>

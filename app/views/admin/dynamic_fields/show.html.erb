@@ -21,6 +21,12 @@
     <td class="label">Check Duplication</td>
     <td class="value"><%= @field.check_duplication? ? 'Yes' : 'No' %></td>
   </tr>
+<% if @field.dynamic_form.use_multistep? -%>
+  <tr>
+    <td class="label">Step</td>
+    <td class="value"><%= @field.step %></td>
+  </tr>
+<% end -%>
   <tr>
     <td class="label">Column Name</td>
     <td class="value"><%= @field.column_name %></td>

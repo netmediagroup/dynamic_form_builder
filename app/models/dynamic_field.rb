@@ -14,7 +14,7 @@ class DynamicField < ActiveRecord::Base
 
   named_scope :active, :conditions => ["active = ?", true]
   named_scope :duplicate_checking, :conditions => ["check_duplication = ?", true]
-  named_scope :default_order, :order => 'sort ASC'
+  named_scope :default_order, :order => 'step ASC, sort ASC'
   named_scope :with_parents, :include => :parents # To help reduce database queries.
   named_scope :with_formats, :include => :dynamic_field_formats # To help reduce database queries.
 
@@ -91,6 +91,10 @@ class DynamicField < ActiveRecord::Base
       end
     else value
     end
+  end
+
+  def last_step_but_not_me
+    self.dynamic_form.last_step(:conditions => ["#{self.class.quoted_table_name}.id <> ?", self.id])
   end
 
 private

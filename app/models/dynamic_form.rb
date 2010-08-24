@@ -22,6 +22,10 @@ class DynamicForm < ActiveRecord::Base
     self.attributes.merge(:fields => self.fields_with_attributes(params))
   end
 
+  def last_step(options={})
+    self.dynamic_fields_solo.maximum('step', options)
+  end
+
 protected
 
   def expire_webservice_cache

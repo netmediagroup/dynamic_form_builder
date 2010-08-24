@@ -15,6 +15,10 @@
     <td class="value"><%= form.text_field :duplication_days, :size => 4 %> days</td>
   </tr>
   <tr>
+    <td class="label"><%= form.label :use_multistep %></td>
+    <td class="value"><%= form.check_box :use_multistep %></td>
+  </tr>
+  <tr>
     <td colspan="2" class="submit"><%= submit_tag %></td>
   </tr>
 </table>

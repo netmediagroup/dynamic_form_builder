@@ -13,6 +13,10 @@
     <td class="label">Duplication Timeframe</td>
     <td class="value"><%= @dynamic_form.duplication_days %> days</td>
   </tr>
+  <tr>
+    <td class="label">Use Multistep</td>
+    <td class="value"><%= @dynamic_form.use_multistep? ? 'Yes' : 'No' %></td>
+  </tr>
   <tr id="detail_created_at" style="display:none;">
     <td class="label">Created</td>
     <td class="value"><%= @dynamic_form.created_at %></td>
