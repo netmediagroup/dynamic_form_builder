@@ -1,27 +1,38 @@
 class DynamicFormBuilder
   attr_reader :form, :dynamic_attributes, :form_params
+  attr_accessor :displaying_step, :next_step
 
   # When calling a new DynamicFormBuilder object, this will set up the form and its dynamic attributes.
   # The dynamic attribute values can also be set.
   def initialize(form_id, form_params={})
+    form_params.stringify_keys!
+
     form_id = form_id.id if form_id.is_a?(DynamicForm)
     instance_variable_set("@form", DynamicForm.find(form_id))
-    instance_variable_set("@form_params", form_params.stringify_keys!)
+
+    self.displaying_step = form_params['displaying_step'].to_i if !form_params['displaying_step'].nil? && self.form.use_multistep?
+    self.next_step = self.displaying_step if self.displaying_step
+
+    instance_variable_set("@form_params", form_params)
     instance_variable_set("@dynamic_attributes", make_dynamic_attributes)
   end
 
   # This will give all the form attributes that will be needed to display the actual form on the page.
   # This also uses the attribute's value in determining if the attribute is displayed in the case of dependent attributes.
   def fields
-    @fields ||= self.form.fields_with_attributes(self.form_params)
+    @fields ||= gather_form_fields
   end
 
   def resource_information
-    info = {:fields => self.fields, :params => self.form_params.empty? ? nil : self.form_params, :valid => self.form_params.empty? ? nil : self.valid?}
-    info[:status_checks] = self.status_checks
-    info[:validation_errors] = self.validation_errors
-
-    return info
+    return {
+      :status_checks => self.status_checks,
+      :validation_errors => self.validation_errors,
+      :displaying_step => self.next_step,
+      :last_step => self.form.last_step,
+      :fields => self.fields,
+      :params => (self.form_params.empty? ? nil : self.form_params),
+      :valid => (self.form_params.empty? ? nil : self.valid?)
+    }
   end
 
   def duplication_attributes
@@ -38,7 +49,18 @@ class DynamicFormBuilder
   end
 
   def status_checks
-    self.valid? ? (self.qualified? ? 'valid' : 'unqualified') : 'invalid'
+    if self.valid?
+      if self.displaying_step && self.form.use_multistep? && self.displaying_step < self.form.last_step
+        self.next_step = self.displaying_step + 1
+        @form_params['displaying_step'] = self.next_step
+        @fields = gather_form_fields
+        return 'step'
+      else
+        return self.qualified? ? 'valid' : 'unqualified'
+      end
+    else
+      return 'invalid'
+    end
   end
 
   def validation_errors
@@ -47,7 +69,7 @@ class DynamicFormBuilder
     end
   end
 
-  # Since the form parameters are load when the instance is initialized, we can cache the return value.
+  # Since the form parameters are loaded when the instance is initialized, we can cache the return value.
   def valid?
     if @is_valid.nil?
       errors.clear
@@ -60,44 +82,7 @@ class DynamicFormBuilder
   # Validate the form based on the fields' requirements and validations.
   def validate
     self.form.fields.each do |field|
-      field_value = instance_variable_get("@dynamic_attributes").fetch(field.column_name.to_sym)
-
-      if field_value.nil? || (!['Boolean'].include?(field.column_type) && field_value.empty?)
-        if field.required?
-          msg = unless field.required_error.blank?
-            field.required_error
-          else
-            if ['DynamicCheckBox','DynamicRadioButton','DynamicSelect'].include?(field.fieldable_type)
-              "Please select #{field.default_error_name}."
-            else
-              "Please enter your #{field.default_error_name}."
-            end
-          end
-          errors.add(field.column_name, msg)
-        end
-      else
-        if field.fieldable.methods.include?('has_option_value?')
-          unless field.fieldable.has_option_value?(field_value)
-            msg = unless field.fieldable.missing_value_error.empty?
-              field.fieldable.missing_value_error
-            else
-              "The value submitted for #{field.default_error_name} is not an option."
-            end
-            errors.add(field.column_name, msg)
-          end
-        end
-
-        field.dynamic_field_checks.for_validation.each do |validation_check|
-          errors.add(field.column_name, validation_check.check_message) unless validation_check.check_field(field_value)
-        end
-
-        field.dynamic_field_checks.for_last_validation.each do |validation_check|
-          unless validation_check.check_field(field_value)
-            errors.add(field.column_name, validation_check.check_message)
-            break
-          end
-        end if errors.instance_variable_get("@errors").has_key?(field.column_name) == false
-      end
+      validate_form_field(field, errors) if self.displaying_step.nil? || self.form.use_multistep? == false || field.step <= self.displaying_step
     end
   end
 
@@ -152,6 +137,10 @@ class DynamicFormBuilder
     @errors ||= ActiveRecord::Errors.new(self)
   end
 
+  def step_errors
+    @step_errors ||= ActiveRecord::Errors.new(self)
+  end
+
   def qualification_errors
     @qualification_errors ||= ActiveRecord::Errors.new(self)
   end
@@ -163,8 +152,53 @@ private  #----------------------------------------------------------------
     return attr.humanize
   end
 
+  def gather_form_fields
+    self.form.fields_with_attributes(self.form_params)
+  end
+
   def make_dynamic_attributes
     self.fields.inject({}) {|fields, field| fields.merge!({field[:column_name].to_sym => field[:value]}); fields}
+  end
+
+  def validate_form_field(field, error_object)
+    field_value = instance_variable_get("@dynamic_attributes").fetch(field.column_name.to_sym)
+
+    if field_value.nil? || (!['Boolean'].include?(field.column_type) && field_value.empty?)
+      if field.required?
+        msg = unless field.required_error.blank?
+          field.required_error
+        else
+          if ['DynamicCheckBox','DynamicRadioButton','DynamicSelect'].include?(field.fieldable_type)
+            "Please select #{field.default_error_name}."
+          else
+            "Please enter your #{field.default_error_name}."
+          end
+        end
+        error_object.add(field.column_name, msg)
+      end
+    else
+      if field.fieldable.methods.include?('has_option_value?')
+        unless field.fieldable.has_option_value?(field_value)
+          msg = unless field.fieldable.missing_value_error.empty?
+            field.fieldable.missing_value_error
+          else
+            "The value submitted for #{field.default_error_name} is not an option."
+          end
+          error_object.add(field.column_name, msg)
+        end
+      end
+
+      field.dynamic_field_checks.for_validation.each do |validation_check|
+        error_object.add(field.column_name, validation_check.check_message) unless validation_check.check_field(field_value)
+      end
+
+      field.dynamic_field_checks.for_last_validation.each do |validation_check|
+        unless validation_check.check_field(field_value)
+          error_object.add(field.column_name, validation_check.check_message)
+          break
+        end
+      end if error_object.instance_variable_get("@errors").has_key?(field.column_name) == false
+    end
   end
 
 end

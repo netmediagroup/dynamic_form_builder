@@ -14,6 +14,7 @@ class DynamicField < ActiveRecord::Base
 
   named_scope :active, :conditions => ["active = ?", true]
   named_scope :duplicate_checking, :conditions => ["check_duplication = ?", true]
+  named_scope :step, lambda { |step| {:conditions => ["step = ?", step]} }
   named_scope :default_order, :order => 'step ASC, sort ASC'
   named_scope :with_parents, :include => :parents # To help reduce database queries.
   named_scope :with_formats, :include => :dynamic_field_formats # To help reduce database queries.
@@ -41,6 +42,7 @@ class DynamicField < ActiveRecord::Base
   end
 
   def field_attributes(params={})
+    params.stringify_keys!
     {
       :required => self.required,
       :column_name => self.column_name,
@@ -55,15 +57,23 @@ class DynamicField < ActiveRecord::Base
   end
 
   def display_field?(params={})
+    if params['displaying_step'].nil?
+      step_display = true
+    else
+      step_display = params['displaying_step'].to_i == self.step
+    end
+
     if self.parents.empty? # Database queries will be significantly reduced if self.parents are preloaded.
-      return true
+      parents_display = true
     else
       fulfilled_parents = true
       parents.each do |parent|
         fulfilled_parents = false unless parent.fulfilled?(params)
       end
-      return fulfilled_parents
+      parents_display = fulfilled_parents
     end
+
+    return step_display && parents_display
   end
 
   def fulfilled?(params={})

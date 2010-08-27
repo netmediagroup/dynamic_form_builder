@@ -15,11 +15,13 @@ class DynamicForm < ActiveRecord::Base
   end
 
   def fields_with_attributes(params={})
+    params.stringify_keys!
     self.fields.inject([]) {|fields, dynamic_field| fields << dynamic_field.field_attributes(params); fields}
   end
 
   def with_fields_and_attributes(params={})
-    self.attributes.merge(:fields => self.fields_with_attributes(params))
+    params.stringify_keys!
+    self.attributes.merge(:displaying_step => params['displaying_step'], :last_step => last_step, :fields => self.fields_with_attributes(params))
   end
 
   def last_step(options={})
