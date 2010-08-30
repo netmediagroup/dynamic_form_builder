@@ -104,7 +104,7 @@ class DynamicField < ActiveRecord::Base
   end
 
   def last_step_but_not_me
-    self.dynamic_form.last_step(:conditions => ["#{self.class.quoted_table_name}.id <> ?", self.id])
+    (self.new_record? ? self.dynamic_form.last_step : self.dynamic_form.last_step(:conditions => ["#{self.class.quoted_table_name}.id <> ?", self.id])) || 0
   end
 
 private
