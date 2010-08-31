@@ -99,6 +99,14 @@ class DynamicField < ActiveRecord::Base
       elsif !value.nil? && (value.is_a?(FalseClass) || (value.is_a?(String) && (!(value =~ /(false|no)/i).nil? || value.to_i <= 0)) || (value.is_a?(Integer) && value <= 0))
         false
       end
+    when 'Integer'
+      if value =~ /^[+\-]?[\d,\.]+$/
+        value.gsub!(/[,]/, '')
+        value = value.to_f.round if value =~ /\./
+        value = value.to_i
+      else
+        ''
+      end
     else value
     end
   end
