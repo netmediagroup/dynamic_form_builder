@@ -24,15 +24,23 @@ class DynamicFormBuilder
   end
 
   def resource_information
-    return {
-      :status_checks => self.status_checks,
-      :validation_errors => self.validation_errors,
-      :displaying_step => self.next_step,
-      :last_step => self.form.last_step,
-      :fields => self.fields,
-      :params => (self.form_params.empty? ? nil : self.form_params),
-      :valid => (self.form_params.empty? ? nil : self.valid?)
-    }
+    if @resource_information.nil?
+      @resource_information = {
+        :status_checks => self.status_checks,
+        :validation_errors => self.validation_errors,
+        :displaying_step => self.next_step,
+        :last_step => self.form.last_step,
+        :fields => self.fields.dup,
+        :params => (self.form_params.empty? ? nil : self.form_params),
+        :valid => (self.form_params.empty? ? nil : self.valid?)
+      }
+
+      @resource_information[:fields].each do |field|
+        field.delete(:save_value)
+        field[:value] = field[:value].inject({}) {|values, v| values[field[:value].index(v)] = v; values} if field[:value].is_a?(Array)
+      end
+    end
+    @resource_information
   end
 
   def duplication_attributes
@@ -178,7 +186,13 @@ private  #----------------------------------------------------------------
       end
     else
       if field.fieldable.methods.include?('has_option_value?')
-        unless field.fieldable.has_option_value?(field_value)
+        correct_values = true
+        field_values = field_value.is_a?(Array) ? field_value : [field_value]
+        field_values.each do |fv|
+          correct_values = false unless field.fieldable.has_option_value?(fv)
+        end
+
+        if correct_values == false
           msg = unless field.fieldable.missing_value_error.empty?
             field.fieldable.missing_value_error
           else
