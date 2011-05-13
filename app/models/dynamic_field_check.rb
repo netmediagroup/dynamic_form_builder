@@ -1,10 +1,10 @@
 class DynamicFieldCheck < ActiveRecord::Base
   CHECK_FORS = ['qualify','validate'].freeze
-  QUALIFYING_TYPES = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','numerical','split_true','split_false'].freeze
-  VALIDATING_TYPES = ['array_true','array_false','custom_true','custom_false','email','length','max_length','min_length','numerical','phone_lookup','phone_validity','split_true','split_false'].freeze
+  QUALIFYING_TYPES = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','numerical','split_true','split_false','custom_method'].freeze
+  VALIDATING_TYPES = ['array_true','array_false','custom_true','custom_false','email','length','max_length','min_length','numerical','phone_lookup','phone_validity','split_true','split_false','custom_method'].freeze
   # CHECK_TYPES = (QUALIFYING_TYPES + VALIDATING_TYPES).uniq.sort.freeze
-  LAST_CHECK_TYPES = ['phone_validity','phone_lookup'].freeze # In order of priority. These are done last and are only checked if there are no errors.
-  CHECK_TYPES_THAT_REQUIRE_VALUE = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','split_true','split_false'].freeze
+  LAST_CHECK_TYPES = ['custom_method','phone_validity','phone_lookup'].freeze # In order of priority. These are done last and are only checked if there are no errors.
+  CHECK_TYPES_THAT_REQUIRE_VALUE = ['array_true','array_false','custom_true','custom_false','length','max_length','min_length','split_true','split_false','custom_method'].freeze
 
   SPLIT_SEPARATOR = '|'
 
@@ -42,13 +42,14 @@ class DynamicFieldCheck < ActiveRecord::Base
       when 'numerical' then 'Numerical'
       when 'split_true' then 'Matching Value'
       when 'split_false' then 'Non-Matching Value'
+      when 'custom_method' then 'Custom Method'
     end
   end
 
   def descriptive_value
     case self.check_type
       when 'array_true','array_false' then value_array.dynamic_array_items.map{|i| i.item_value}.join('<br>')
-      when 'custom_true','custom_false','max_length','min_length','length' then self.check_value
+      when 'custom_true','custom_false','max_length','min_length','length','custom_method' then self.check_value
       when 'email' then value_email
       when 'phone_validity' then 'A common set of invalid phone number combinations.'
       when 'split_true','split_false' then value_split.join('<br>')
@@ -59,32 +60,40 @@ class DynamicFieldCheck < ActiveRecord::Base
   def check_field(field_value)
     field_value = formatted_value(field_value.dup)
     case self.check_type
-      when 'array_true'
-        !field_value.nil? && !check_array(field_value)
-      when 'array_false'
-        field_value.nil? || check_array(field_value)
-      when 'custom_true'
-        !field_value.nil? && !check_custom(field_value)
-      when 'custom_false'
-        field_value.nil? || check_custom(field_value)
-      when 'email'
-        !field_value.nil? && !check_custom(field_value, value_email)
-      when 'length'
-        !field_value.nil? && field_value.length == self.check_value.to_i
-      when 'max_length'
-        !field_value.nil? && field_value.length <= self.check_value.to_i
-      when 'min_length'
-        !field_value.nil? && field_value.length >= self.check_value.to_i
-      when 'numerical'
-        !field_value.nil? && !field_value.match(self.check_value.blank? ? /\A[+\-]?\d+\Z/ : self.check_value).nil?
-      when 'phone_lookup'
-        !field_value.nil? && check_phone_lookup(field_value)
-      when 'phone_validity'
-        !field_value.nil? && check_phone_validity(field_value)
-      when 'split_true'
-        !field_value.nil? && check_split(field_value)
-      when 'split_false'
-        field_value.nil? || !check_split(field_value)
+    when 'array_true'
+      !field_value.nil? && !check_array(field_value)
+    when 'array_false'
+      field_value.nil? || check_array(field_value)
+    when 'custom_true'
+      !field_value.nil? && !check_custom(field_value)
+    when 'custom_false'
+      field_value.nil? || check_custom(field_value)
+    when 'email'
+      !field_value.nil? && !check_custom(field_value, value_email)
+    when 'length'
+      !field_value.nil? && field_value.length == self.check_value.to_i
+    when 'max_length'
+      !field_value.nil? && field_value.length <= self.check_value.to_i
+    when 'min_length'
+      !field_value.nil? && field_value.length >= self.check_value.to_i
+    when 'numerical'
+      !field_value.nil? && !field_value.match(self.check_value.blank? ? /\A[+\-]?\d+\Z/ : self.check_value).nil?
+    when 'phone_lookup'
+      !field_value.nil? && check_phone_lookup(field_value)
+    when 'phone_validity'
+      !field_value.nil? && check_phone_validity(field_value)
+    when 'split_true'
+      !field_value.nil? && check_split(field_value)
+    when 'split_false'
+      field_value.nil? || !check_split(field_value)
+    when 'custom_method'
+      begin
+        custom_match = self.check_value.match(/^(.*?)\.(.*)$/)
+        !field_value.nil? && custom_match[1].constantize.send(custom_match[2], field_value)
+      rescue
+        Rails.logger.warn("***\n***  A DynamicFieldCheck's Custom Method, #{self.check_value}, was rescued and not used in the check.\n***")
+        true # Invalid custom method, so we have to disallow this check.
+      end
     end
   end
 
@@ -106,6 +115,7 @@ class DynamicFieldCheck < ActiveRecord::Base
         when 'phone_validity' then self.message(:invalid)
         when 'split_true'     then self.message(:inclusion)
         when 'split_false'    then self.message(:exclusion)
+        when 'custom_method'  then self.message(:invalid)
       end
       return "#{self.dynamic_field.default_error_name} #{msg}"
     end
