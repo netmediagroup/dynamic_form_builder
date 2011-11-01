@@ -52,32 +52,27 @@ class DynamicField < ActiveRecord::Base
       :field_type => self.field_type,
       :value => self.fieldable.field_value(params),#self.format(self.fieldable.field_value(params), 'display'), # I'm not sure now if formatting will be used.
       :save_value => self.fieldable.save_value(params),
-      :column_type => self.column_type
+      :column_type => self.column_type,
+      :parents => (self.dynamic_field_dependency_parents.inject({}) {|parents, dependency| parents[dependency.parent.column_name] = dependency.dependent_value; parents } unless self.parents.empty?),
+      :children => !self.children.empty?
     }.merge(self.fieldable.field_attributes(params))
   end
 
   def display_field?(params={})
-    if params['displaying_step'].nil?
-      step_display = true
-    else
-      step_display = params['displaying_step'].to_i == self.step
-    end
+    return true if params['displaying_step'].nil?
+    return false if params['displaying_step'].to_i != self.step
 
-    if self.parents.empty? # Database queries will be significantly reduced if self.parents are preloaded.
-      parents_display = true
+    if self.parents.empty?
+      return true
+    elsif parents_fulfilled?(params)
+      return true
     else
-      fulfilled_parents = true
-      parents.each do |parent|
-        fulfilled_parents = false unless parent.fulfilled?(params)
-      end
-      parents_display = fulfilled_parents
+      return 'dependent'
     end
-
-    return step_display && parents_display
   end
 
   def fulfilled?(params={})
-    params[self.column_name.to_sym]
+    params.stringify_keys[self.column_name]
   end
 
   def format(value, format_when)
@@ -113,6 +108,20 @@ class DynamicField < ActiveRecord::Base
 
   def last_step_but_not_me
     (self.new_record? ? self.dynamic_form.last_step : self.dynamic_form.last_step(:conditions => ["#{self.class.quoted_table_name}.id <> ?", self.id])) || 0
+  end
+
+  def parents_fulfilled?(params={})
+    # Database queries will be significantly reduced if self.parents are preloaded.
+    return true if self.parents.empty?
+
+    parents_fulfilled = self.dynamic_field_dependency_parents.collect do |dynamic_field_dependency_parent|
+      if dynamic_field_dependency_parent.dependent_value.empty?
+        !dynamic_field_dependency_parent.parent.fulfilled?(params).nil?
+      else
+        dynamic_field_dependency_parent.parent.fulfilled?(params) == dynamic_field_dependency_parent.dependent_value
+      end
+    end
+    return parents_fulfilled.include?(false) == false
   end
 
 private

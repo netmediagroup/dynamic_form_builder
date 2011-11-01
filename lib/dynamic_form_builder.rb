@@ -90,7 +90,11 @@ class DynamicFormBuilder
   # Validate the form based on the fields' requirements and validations.
   def validate
     self.form.fields.each do |field|
-      validate_form_field(field, errors) if self.displaying_step.nil? || self.form.use_multistep? == false || field.step <= self.displaying_step
+      if self.displaying_step.nil? || self.form.use_multistep? == false || field.step <= self.displaying_step
+        if field.parents_fulfilled?(self.form_params)
+          validate_form_field(field, errors)
+        end
+      end
     end
   end
 
