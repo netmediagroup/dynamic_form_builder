@@ -1,17 +1,29 @@
 class PhoneLookup < ActiveRecord::Base
+  LOOKUP_TYPE = 'StrikeIron::ReversePhoneAddressLookupAdvanced'
+
   validates_format_of :phone_number, :with => /\A\d{10}\Z/, :allow_nil => false, :allow_blank => false
-  validates_uniqueness_of :phone_number
+  validates_presence_of :lookup_type
+  validates_uniqueness_of :phone_number, :scope => :lookup_type
 
   before_create :perform_create_lookup
 
-  attr_accessible :phone_number
+  attr_accessible :phone_number, :lookup_type
 
-  def phone_number=(value)
-    super(value) if self.lookup_performed_at.nil?
+  def self.get_phone(phone)
+    find_or_create_by_phone_number_and_lookup_type(phone, LOOKUP_TYPE)
+  end
+
+  def self.acceptable?(phone)
+    lookup = get_phone(phone)
+    lookup.acceptable?
   end
 
   def acceptable?
-    (self.status_nbr != '200' && self.cell_phone == 'F') ? false : true unless self.lookup_performed_at.nil?
+    (self.status_nbr != '200' && self.cell_phone == 'F') ? false : true if self.lookup_performed_at.present?
+  end
+
+  def phone_number=(value)
+    super(value) if self.lookup_performed_at.nil?
   end
 
 protected
@@ -21,8 +33,8 @@ protected
   end
 
   def perform_lookup
-    unless self.phone_number.nil?
-      @lookup = StrikeIron::ReversePhoneAddressLookup.new(self.phone_number)
+    if self.phone_number.present?
+      @lookup = LOOKUP_TYPE.constantize.new(self.phone_number)
       @lookup.attributes.each do |key, value|
         self.send("#{key}=", value) if self.attributes.include?(key.to_s)
       end

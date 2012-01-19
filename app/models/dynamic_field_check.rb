@@ -175,8 +175,7 @@ protected
   end
 
   def check_phone_lookup(field_value)
-    lookup = PhoneLookup.find_or_create_by_phone_number(field_value)
-    lookup.acceptable?
+    PhoneLookup.acceptable?(field_value)
   end
 
   def check_phone_validity(field_value)
